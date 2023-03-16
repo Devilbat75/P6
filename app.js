@@ -1,6 +1,7 @@
 const express = require('express');
-
 const app = express();
+
+const Thing = require('./models/thing');
 
 app.use(express.json());
 
@@ -12,14 +13,17 @@ app.use((req, res, next) => {
 });
 
 app.post('/api/sauces', (req, res, next) => {
-    console.log(req.body);
-    res.status(201).json({
-        message: 'Objet créer !'
-    });
+    delete req.body._id;
+    const thing = new Thing({
+        ...req.body
+    })
+    thing.save()
+    .then(() => res.status(201).json({ message : 'Objet enregistré !'}))
+    .catch(error => res.status(400).json({ error }));
 });
 
 app.get('/api/sauces', (req, res, next) => {
-    const stuff = [
+    const sauces = [
         {
             _id: 'oeihfzeoi',
             title: 'Mon premier objet',
@@ -37,7 +41,15 @@ app.get('/api/sauces', (req, res, next) => {
             userId: 'qsomihvqios',
         },
     ];
-    res.status(200).json(stuff);
+    res.status(200).json(sauces);
 });
 
 module.exports = app;
+
+const mongoose = require('mongoose');
+
+mongoose.connect('mongodb+srv://ludovicbdt:xDIpF4xzpq3JwYuB@cluster0.a1wvpjy.mongodb.net/?retryWrites=true&w=majority',
+  { useNewUrlParser: true,
+    useUnifiedTopology: true })
+  .then(() => console.log('Connexion à MongoDB réussie !'))
+  .catch(() => console.log('Connexion à MongoDB échouée !'));
