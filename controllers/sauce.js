@@ -5,18 +5,21 @@ const fs = require('fs');
 
 //Création de la route pour creer une sauce
 exports.createSauce = (req, res, next) => {
-    const sauceObject = JSON.parse(req.body.sauce);
+    const sauceObject = JSON.parse(req.body.sauce)
     delete sauceObject._id;
-    delete sauceObject._userId;
     const sauce = new Sauce({
-        ...sauceObject,
-        userId: req.auth.userId,
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+      ...sauceObject,
+      imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+      likes: 0,
+      dislikes: 0,
+      usersLiked: [' '],
+      usersdisLiked: [' '],
     });
-    sauce.save()
-        .then(() => res.status(201).json({ message: 'Sauce enregistrée !' }))
-        .catch(error => res.status(400).json({ error }));
-};
+    sauce
+      .save()
+      .then(() => res.status(201).json({ message: "Sauce enregistrée" }))
+      .catch((error) => res.status(400).json({ error }));
+  };
 //Création de la route pour modifier une sauce uniquement pour l'utilisateur l'ayant créé
 exports.updateSauce = (req, res, next) => {
     const sauceObject = req.file ? {
